@@ -1,7 +1,8 @@
-import {  Router, type Request, type Response } from "express";
-import { ShapeDataSchema } from "../../zod/schema.sharelink";
+import { Router, type Request, type Response } from "express";
+import { roomRequestSchema, ShapeDataSchema } from "../../zod/schema.sharelink";
 import { handleCompression, handleDecompress } from "../../utils/lz";
 import connectToRedis from "../../config/redis";
+import RoomManger from "../../manager/RoomManger";
 
 const shareRouter = Router();
 
@@ -79,4 +80,33 @@ shareRouter.get("/get-shape-data", async(request : Request, response : Response)
         json : result,        
     })
 })
+
+
+shareRouter.post("/create-room", async(request : Request, response : Response) => {
+    const {data, error } = roomRequestSchema.safeParse(request.body);
+
+    if(error){
+        response.status(400).json({
+            success : false,
+            message : "Id and name is required",
+        })
+        return;
+    }
+
+    if(data) {
+        // For scalable Architecture this should be redis atleast
+        const result = RoomManger.addRoomMember(data.id)
+        response.status(200).json({
+            success : true,
+            message : result
+        })
+    }
+
+})
+
+
+
+
+
+shareRouter.route
 export default shareRouter

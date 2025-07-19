@@ -6,5 +6,26 @@ export const ShapeDataSchema = z.object({
   json: z.string(),
 });
 
+
+export const roomRequestSchema = z.object({
+  id : z.string(),
+  name : z.string()
+})
+
+
+export enum MessageType {
+  JOIN_ROOM = "join-room",
+  REMOVE_ROOM = "remove-room",
+  SHARE_DRAW_STATE = "share-draw-stare"
+}
+
+
+export const messageSchema = z.object({
+  type : z.enum(MessageType),
+  name : z.string(),
+  roomId : z.string(),
+  message : z.string().optional()
+})
+
 // Type export
 export type ShapeData = z.infer<typeof ShapeDataSchema>;
