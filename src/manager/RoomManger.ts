@@ -22,7 +22,6 @@ class RoomManger {
             }
         }
 
-        // Case 1 existing roomMember
         if(!this.rooms.has(roomId)){
             return {
                 error : `There are no room with id ${roomId}`,
@@ -31,6 +30,13 @@ class RoomManger {
         }
 
         const existingRoomMember = this.rooms.get(roomId)!;
+        const doesThisMemberAlreadyExist = existingRoomMember.find(roomMember => JSON.stringify(roomMember) === JSON.stringify(newRoomMember))
+        if(doesThisMemberAlreadyExist){
+            return {
+                error : "Member Already Exist",
+                result : null
+            }
+        }
         existingRoomMember.push(newRoomMember!)
         this.rooms.set(roomId, existingRoomMember);
 
@@ -57,6 +63,10 @@ class RoomManger {
         }
         this.rooms.delete(roomId);
         console.log("Room has been deleted")
+    }
+
+    getRoomMembers = (roomId : string) => {
+        return this.rooms.get(roomId)
     }
 }
 

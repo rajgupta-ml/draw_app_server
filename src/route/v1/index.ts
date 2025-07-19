@@ -42,8 +42,8 @@ shareRouter.post("/generate-share-link", (request: Request, response: Response) 
 
 
 shareRouter.get("/get-shape-data", async(request : Request, response : Response) => {
+    // This id can be a roomId and share link id 
     const id  = request.query.id as string ;
-    console.log(id);
     if(!id){
         response.status(400).json({
             success : false,
@@ -103,6 +103,8 @@ shareRouter.post("/create-room", async(request : Request, response : Response) =
     }
 
 })
+
+
 
 
 

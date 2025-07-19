@@ -35,13 +35,12 @@ class WebsocketManager {
         this.wss.on("connection", (ws : Websocket) => {
             console.log("Connection Created");
 
-            ws.on("message", (bufferMessage : Websocket.RawData) => {
+            ws.on("message", async (bufferMessage : Websocket.RawData) => {
                 const message = bufferMessage.toString()
                 console.log(message)
                     const {data, error} = messageSchema.safeParse(JSON.parse(message));
 
                     if(error){
-                        console.log(error)
                         ws.send("Wrong Format of message")
                     }else{
 
@@ -53,7 +52,7 @@ class WebsocketManager {
                             type,
                             ws
                         }
-                        const result = MessageHandler.dispatchMessage(args);
+                        const result = await MessageHandler.dispatchMessage(args);
                         ws.send(JSON.stringify(result))                      
                         
                     }
