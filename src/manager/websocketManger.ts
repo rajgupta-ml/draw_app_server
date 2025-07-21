@@ -36,28 +36,25 @@ class WebsocketManager {
             console.log("Connection Created");
 
             ws.on("message", async (bufferMessage : Websocket.RawData) => {
-                const message = bufferMessage.toString()
-                console.log(message)
-                    const {data, error} = messageSchema.safeParse(JSON.parse(message));
-
-                    if(error){
-                        ws.send("Wrong Format of message")
-                    }else{
-
-                        const {message, name, roomId, type} = data
-                        const args : MessageDispactarType = {
-                            message,
-                            name,
-                            roomId,
-                            type,
-                            ws
-                        }
-                        const result = await MessageHandler.dispatchMessage(args);
-                        ws.send(JSON.stringify(result))                      
+                const raw = bufferMessage.toString()
+                if(!raw){
+                    return
+                }
+                const parsedData = JSON.parse(raw);
+                const args = {...parsedData, ws} as MessageDispactarType
+                // console.log("parsedData:", parsedData)
+                // const {data, error} = messageSchema.safeParse(parsedData);
+                
                         
-                    }
-
-
+               
+                        // const args : MessageDispactarType = {
+                        //     message,
+                        //     name,
+                        //     roomId,
+                        //     type,
+                        //     ws
+                        // }
+                        await MessageHandler.dispatchMessage(args);                      
             })      
         })
     }

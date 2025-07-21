@@ -16,8 +16,11 @@ export const roomRequestSchema = z.object({
 export enum MessageType {
   JOIN_ROOM = "join-room",
   REMOVE_ROOM = "remove-room",
-  SHARE_DRAW_STATE = "share-draw-state",
-  SAVE_DRAW_STATE = "save-draw-state"
+  SAVE_DRAW_STATE = "save-draw-state",
+  SESSION_CREATED = "create-session",
+  SESSION_UPDATED = "update-session",
+  SESSION_DELETED = "delete-session",
+
 }
 
 

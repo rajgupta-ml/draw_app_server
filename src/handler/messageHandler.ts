@@ -18,11 +18,13 @@ export class MessageHandler {
     private static redis = connectToRedis();
     static async dispatchMessage (args : MessageDispactarType){
         const {type} = args
-
         switch (type) {
             case MessageType.JOIN_ROOM :
-                return await this.handleJoinRoom(args)
-            case MessageType.SHARE_DRAW_STATE:
+                await this.handleJoinRoom(args)
+                break;
+                case  MessageType.SESSION_UPDATED:
+            case MessageType.SESSION_CREATED:
+            case MessageType.SESSION_DELETED:
                 this.handleShareDrawState(args)
                 break;
             case MessageType.SAVE_DRAW_STATE:
@@ -30,8 +32,9 @@ export class MessageHandler {
                 break
             default :
                 return {
+                    type : "unknow",
                     result : null,
-                    error : false
+                    error : true
                 }
         }
     }
@@ -49,32 +52,37 @@ export class MessageHandler {
             this.redis.set(roomId, "");
         }
 
-        return roomResult;
+        ws.send(JSON.stringify({...roomResult, type : MessageType.JOIN_ROOM}))
+        // return {...roomResult, type : MessageType.JOIN_ROOM};
     }
 
 
     private static async handleShareDrawState(args : MessageDispactarType) {
         
-        const { ws : SenderWs, roomId, message} = args
-        if(!message){
-            return 
-        }
 
-        const roomMembers = RoomManger.getRoomMembers(roomId)!
+        try {
+            const { ws : SenderWs, roomId, message} = args
+            if(!message){
+                return 
+            }
         
-        for(let i = 0; i < roomMembers.length; i++) {
-            const roomMember = roomMembers[i]!;
-            const {ws} = roomMember;
-            if(ws === SenderWs){
-                continue;
+            const roomMembers = RoomManger.getRoomMembers(roomId)!
+            for(let i = 0; i < roomMembers.length; i++) {
+                const roomMember = roomMembers[i]!;
+                const {ws} = roomMember;
+                if(ws === SenderWs){
+                    continue;
+                }
+                const newMessage = {
+                    type : "shape-data",
+                    message : JSON.parse(message)
+                }
+    
+                ws.send(JSON.stringify(newMessage));
             }
-            const newMessage = {
-                type : "shape-data",
-                message
-            }
-            ws.send(JSON.stringify(newMessage));
+        } catch (error) {
+            console.log(error);    
         }
-        
     }
 
     private static async handleSaveDrawState(args : MessageDispactarType) {
